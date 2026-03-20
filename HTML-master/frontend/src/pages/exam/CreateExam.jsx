@@ -31,16 +31,18 @@ const CreateExam = () => {
   const [allowPractice, setAllowPractice] = useState(true);
   const [questions, setQuestions] = useState([]);
 
-  // --- QUẢN LÝ MODAL ---
-  const [notification, setNotification] = useState(null); 
+  // --- QUẢN LÝ MODAL & THÔNG BÁO ---
+  const [notification, setNotification] = useState(null); // Dùng cho bảng to lúc Lưu bài
   const [deleteIndex, setDeleteIndex] = useState(null);
+  
+  // MỚI: Dùng cho thông báo nhỏ tự động tắt (Toast) khi Import Excel
+  const [toast, setToast] = useState(null);
 
-  // Tải dữ liệu cũ khi ở chế độ chỉnh sửa 
+  // Tải dữ liệu cũ khi ở chế độ chỉnh sửa
   useEffect(() => {
     if (isEditMode) {
       const fetchOldData = async () => {
         try {
-          // File api.js của bạn đã trả về response.data nên dùng trực tiếp res 
           const res = await api.get(`/exams/${id}/questions`);
           if (res) {
             const { exam, questions: oldQuestions } = res;
@@ -62,7 +64,15 @@ const CreateExam = () => {
     }
   }, [id, isEditMode, navigate]);
 
-  // --- XỬ LÝ FILE EXCEL [cite: 1] ---
+  // Hàm hiển thị thông báo nhỏ tự động tắt
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 3000); // Tự tắt sau 3 giây
+  };
+
+  // --- XỬ LÝ FILE EXCEL ---
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -80,20 +90,23 @@ const CreateExam = () => {
           importedQuestions.push({
             question_text: row[0],
             options: [
-              { option_text: row[1], is_correct: correctAnswerChar === "A" },
-              { option_text: row[2], is_correct: correctAnswerChar === "B" },
-              { option_text: row[3], is_correct: correctAnswerChar === "C" },
-              { option_text: row[4], is_correct: correctAnswerChar === "D" },
+              { option_text: row[1] || "", is_correct: correctAnswerChar === "A" },
+              { option_text: row[2] || "", is_correct: correctAnswerChar === "B" },
+              { option_text: row[3] || "", is_correct: correctAnswerChar === "C" },
+              { option_text: row[4] || "", is_correct: correctAnswerChar === "D" },
             ],
           });
         }
         setQuestions((prev) => [...prev, ...importedQuestions]);
-        setNotification({ type: "success", message: `Đã nhập thành công ${importedQuestions.length} câu hỏi!` });
+        
+        // Thay vì setNotification (bảng to), ta dùng showToast (bảng nhỏ)
+        showToast(`Đã tải lên thành công ${importedQuestions.length} câu hỏi!`);
       } catch (err) {
-        setNotification({ type: "error", message: "Lỗi đọc file Excel." });
+        showToast("Lỗi đọc file Excel. Định dạng không hợp lệ!", "error");
       }
     };
     reader.readAsBinaryString(file);
+    e.target.value = null; // Reset input để có thể chọn lại cùng 1 file nếu cần
   };
 
   // --- QUẢN LÝ CÂU HỎI ---
@@ -136,16 +149,16 @@ const CreateExam = () => {
     }
   };
 
-  // --- GỬI DỮ LIỆU LÊN BACKEND [cite: 21] ---
+  // --- GỬI DỮ LIỆU LÊN BACKEND ---
   const handleSubmit = async () => {
     if (!examData.title) return setNotification({ type: "error", message: "Vui lòng nhập tên đề thi!" });
-    if (questions.length === 0) return setNotification({ type: "error", message: "Đề thi cần có câu hỏi!" });
+    if (questions.length === 0) return setNotification({ type: "error", message: "Đề thi cần có ít nhất 1 câu hỏi!" });
 
     setLoading(true);
     try {
       const payload = { 
         ...examData, 
-        allow_practice: allowPractice ? 1 : 0, // Chuyển sang 0/1 cho DB
+        allow_practice: allowPractice ? 1 : 0,
         questions 
       };
 
@@ -164,7 +177,16 @@ const CreateExam = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 mb-20">
+    <div className="max-w-4xl mx-auto px-4 py-8 mb-20 relative">
+      
+      {/* MỚI: Hiển thị Toast thông báo nhỏ trên góc phải */}
+      {toast && (
+        <div className={`fixed top-24 right-6 z-50 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 font-bold text-white animate-in slide-in-from-right duration-300 ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+          {toast.type === 'success' ? <CheckCircle size={24} /> : <XCircle size={24} />}
+          {toast.message}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <button onClick={() => navigate("/")} className="p-2 bg-white rounded-full shadow hover:bg-gray-100 transition">
@@ -183,20 +205,23 @@ const CreateExam = () => {
               <input className="w-full border-gray-200 border rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none" value={examData.title} onChange={e => setExamData({...examData, title: e.target.value})} placeholder="VD: Kiểm tra cuối kỳ Mạng máy tính"/>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian (phút)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian thi thực tế (phút)</label>
               <input type="number" className="w-full border-gray-200 border rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none" value={examData.duration} onChange={e => setExamData({...examData, duration: parseInt(e.target.value)})}/>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
               <select className="w-full border-gray-200 border rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none" value={examData.is_public} onChange={e => setExamData({...examData, is_public: parseInt(e.target.value)})}>
-                <option value={1}>Công khai (Ai cũng thấy)</option>
-                <option value={0}>Riêng tư (Chỉ mình bạn)</option>
+                <option value={1}>Công khai</option>
+                <option value={0}>Riêng tư</option>
               </select>
             </div>
             <div className="md:col-span-2 flex items-center justify-between p-4 bg-blue-50 rounded-xl border border-blue-100">
               <div>
-                <p className="font-bold text-blue-900">Chế độ Ôn tập</p>
-                <p className="text-xs text-blue-700">Người thi có thể xem đáp án ngay lập tức và dùng AI giải thích[cite: 2, 3].</p>
+                <p className="font-bold text-blue-900">Cho phép Chế độ Ôn tập</p>
+                {/* MỚI: Thêm ghi chú không giới hạn thời gian làm bài ôn tập */}
+                <p className="text-xs text-blue-700 mt-1">
+                  Người thi có thể xem đáp án ngay lập tức và dùng AI giải thích. <strong>Lưu ý: Phần ôn tập sẽ không giới hạn thời gian làm bài.</strong>
+                </p>
               </div>
               <input type="checkbox" className="w-6 h-6 accent-blue-600 cursor-pointer" checked={allowPractice} onChange={e => setAllowPractice(e.target.checked)}/>
             </div>
@@ -208,7 +233,8 @@ const CreateExam = () => {
           <h2 className="text-xl font-bold text-gray-800">Câu hỏi ({questions.length})</h2>
           <div className="flex gap-3">
             <label className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl cursor-pointer hover:bg-green-700 transition font-bold shadow-md">
-              <Upload size={18}/> Excel <input type="file" className="hidden" accept=".xlsx, .xls" onChange={handleFileUpload}/>
+              <Upload size={18}/> Excel 
+              <input type="file" className="hidden" accept=".xlsx, .xls" onChange={handleFileUpload}/>
             </label>
             <button onClick={addManualQuestion} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition font-bold shadow-md">
               <PlusCircle size={18}/> Thêm câu
@@ -246,7 +272,7 @@ const CreateExam = () => {
         </div>
       </div>
 
-      {/* Modals xác nhận & thông báo giữ nguyên logic của bạn */}
+      {/* Modals xác nhận & thông báo khi LƯU */}
       {deleteIndex !== null && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
