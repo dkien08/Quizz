@@ -1,0 +1,28 @@
+flowchart TD
+    Start([Bắt đầu]) --> Select[User chọn đề thi từ danh sách]
+    Select --> CheckMode{User chọn\nchế độ nào?}
+
+    %% Nhánh Chế độ Thi
+    CheckMode -- "Chế độ Thi" --> StartTimer[Bắt đầu tính giờ - duration]
+    StartTimer --> HideInfo[Ẩn đáp án & giải thích]
+    HideInfo --> LoopExam{Còn câu hỏi &\ncòn thời gian?}
+    LoopExam -- "Có" --> AnswerExam[User chọn đáp án & lưu tạm]
+    AnswerExam --> LoopExam
+    LoopExam -- "Hết giờ/Nộp bài" --> Grade[Hệ thống chấm điểm tự động]
+    Grade --> ShowScore[Hiển thị điểm số cuối cùng]
+
+    %% Nhánh Chế độ Ôn tập
+    CheckMode -- "Chế độ Ôn tập" --> NoTimer[Không giới hạn thời gian]
+    NoTimer --> LoopPractice{User đang\nlàm bài?}
+    LoopPractice -- "Có" --> AnswerPractice[User chọn đáp án]
+    AnswerPractice --> ShowInstant[Hiển thị đúng/sai ngay lập tức]
+    ShowInstant --> AskAI{User muốn\nhiểu rõ?}
+    AskAI -- "Nhấn nút Giải thích AI" --> CallGemini[Backend gọi Gemini API\nhiển thị ai_explanation]
+    AskAI -- "Bỏ qua" --> LoopPractice
+    CallGemini --> LoopPractice
+    LoopPractice -- "User thoát" --> Save
+
+    %% Kết thúc chung
+    ShowScore --> Save[Lưu vào bảng Results\nvà Exam_Answers]
+    Save --> UpdateStat[Cập nhật Thống kê lượt thi]
+    UpdateStat --> End([Kết thúc])

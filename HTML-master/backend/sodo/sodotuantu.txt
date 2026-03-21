@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant U as User (Frontend)
+    participant B as Backend (Node.js)
+    participant DB as Aiven MySQL
+    participant AI as Gemini API
+
+    U->>B: POST /api/chat/explain (question_id)
+    B->>DB: SELECT question_text, ai_explanation FROM questions WHERE id = ?
+    DB-->>B: Trả về dữ liệu câu hỏi
+    
+    alt Nếu đã có ai_explanation trong DB
+        B-->>U: Trả về kết quả giải thích (Tiết kiệm Quota)
+    else Nếu chưa có ai_explanation
+        B->>AI: Gửi Prompt (Nội dung câu hỏi + Yêu cầu giải thích)
+        AI-->>B: Trả về nội dung giải thích mới
+        B->>DB: UPDATE questions SET ai_explanation = ? WHERE id = ?
+        B-->>U: Trả về kết quả giải thích cho User
+    end

@@ -1,0 +1,170 @@
+📌 1. YÊU CẦU CHUNG (QUAN TRỌNG)
+Frontend cần lưu ý các chuẩn giao tiếp sau với Backend:
+
+Base URL: Các đường dẫn bên dưới là đường dẫn tương đối. Hãy thêm http://localhost:5000/api (hoặc domain Render/Vercel) vào phía trước. (Ví dụ: /auth/login -> http://localhost:5000/api/auth/login).
+
+Xác thực (Authentication): Các API có đánh dấu 🔒 [Cần Token] bắt buộc phải gửi kèm Header như sau:
+
+JSON
+{
+  "Authorization": "Bearer <chuỗi_token_nhận_được_khi_login>"
+}
+Content-Type: Mặc định gửi data dạng JSON: Content-Type: application/json.
+
+Xử lý mã lỗi HTTP:
+
+200 / 201: Thành công.
+
+400: Lỗi dữ liệu gửi lên (thiếu trường, sai định dạng).
+
+401: Lỗi Token (chưa đăng nhập hoặc Token hết hạn). Frontend cần tự động đẩy về trang Login.
+
+403: Không có quyền (Ví dụ: sinh viên cố sửa đề của giáo viên).
+
+404: Không tìm thấy dữ liệu (Sai mã đề, user không tồn tại).
+
+📌 2. DANH SÁCH API CHI TIẾT
+🟢 Nhóm 1: Xác thực & Tài khoản (Auth & Users)
+(Base route đề xuất: /api/auth và /api/users)
+
+1. Đăng ký tài khoản
+
+Endpoint: POST /auth/register
+
+Body:
+
+JSON
+{ "username": "student1", "password": "123", "full_name": "Nguyễn Văn A", "role": "users" }
+Response (200): { "message": "Đăng ký thành công!" }
+
+2. Đăng nhập
+
+Endpoint: POST /auth/login
+
+Body: { "username": "student1", "password": "123" }
+
+Response (200): Trả về token (nhớ lưu vào localStorage) và thông tin user.
+
+3. Xem thông tin cá nhân 🔒 [Cần Token]
+
+Endpoint: GET /users/profile
+
+4. Cập nhật họ tên 🔒 [Cần Token]
+
+Endpoint: PUT /users/profile
+
+Body: { "full_name": "Tên Mới" }
+
+5. Đổi mật khẩu 🔒 [Cần Token]
+
+Endpoint: PUT /users/change-password
+
+Body: { "old_password": "...", "new_password": "..." }
+
+🔵 Nhóm 2: Quản lý & Làm bài thi (Exams)
+(Base route đề xuất: /api/exams)
+
+6. Lấy danh sách đề thi Public (Trang chủ)
+
+Endpoint: GET /exams
+
+Mô tả: Trả về danh sách tất cả các đề có cờ is_public = 1.
+
+7. Tìm và lấy đề thi bằng Mã code (Vào thi/Ôn tập)
+
+Endpoint: GET /exams/code/:code?mode=practice (Ví dụ: /exams/code/X8K9L1?mode=practice)
+
+Mô tả: Nếu thi thật thì không truyền mode, nếu ôn tập thì truyền ?mode=practice. Chế độ thi thật sẽ không trả về ai_explanation và đáp án đúng.
+
+8. Nộp bài thi 🔒 [Cần Token]
+
+Endpoint: POST /exams/submit
+
+Body: Array các câu trả lời của thí sinh.
+
+JSON
+{
+  "exam_id": 5,
+  "answers": [
+    { "question_id": 9, "option_id": 30 },
+    { "question_id": 10, "option_id": 35 }
+  ]
+}
+Response (200): { "message": "Nộp bài thành công!", "result_id": 12, "score": 8.5 }
+
+9. Xem điểm tổng quát của một lượt thi 🔒 [Cần Token]
+
+Endpoint: GET /exams/result/:id (Trong đó :id là result_id trả về ở bước nộp bài)
+
+10. Xem chi tiết từng đáp án đã làm 🔒 [Cần Token]
+
+Endpoint: GET /exams/result-detail/:id (Trong đó :id là result_id)
+
+Mô tả: Trả về danh sách câu hỏi, đáp án User chọn và đáp án đúng.
+
+🟠 Nhóm 3: Dành cho Người tạo đề (Author/Admin)
+(Base route đề xuất: /api/exams)
+
+11. Lấy danh sách đề tôi đã tạo 🔒 [Cần Token]
+
+Endpoint: GET /exams/my-exams
+
+12. Tạo đề thi mới 🔒 [Cần Token]
+
+Endpoint: POST /exams/create
+
+Body:
+
+JSON
+{
+  "title": "Kiểm tra Mạng",
+  "description": "Mô tả...",
+  "duration": 45,
+  "is_public": 1,
+  "allow_practice": 1,
+  "questions": [
+     {
+       "question_text": "Câu 1?",
+       "options": [
+          { "option_text": "A", "is_correct": 1 },
+          { "option_text": "B", "is_correct": 0 }
+       ]
+     }
+  ]
+}
+13. Lấy data đề thi để Edit 🔒 [Cần Token]
+
+Endpoint: GET /exams/:id/questions (Trong đó :id là exam_id)
+
+14. Lưu thay đổi đề thi (Edit) 🔒 [Cần Token]
+
+Endpoint: PUT /exams/:id
+
+Body: Cấu trúc y hệt lúc Create, nếu câu nào cũ thì truyền thêm id của câu đó.
+
+15. Xóa đề thi 🔒 [Cần Token]
+
+Endpoint: DELETE /exams/:id
+
+16. Lấy thống kê của một đề thi 🔒 [Cần Token]
+
+Endpoint: GET /exams/:id/stats
+
+Mô tả: Xem có bao nhiêu lượt thi, điểm số từng người (Chỉ chủ đề hoặc Admin mới xem được).
+
+🟣 Nhóm 4: Tính năng Trí tuệ Nhân tạo (Gemini AI)
+17. AI Giải thích đáp án (Chế độ Ôn tập) 🔒 [Cần Token]
+
+Endpoint: POST /exams/explain-question
+
+Body: { "question_id": 32 }
+
+Mô tả: Backend sẽ tự check xem đã có giải thích chưa, nếu chưa sẽ gọi Gemini.
+
+18. Chatbot Trợ lý học tập
+
+Endpoint: POST /api/chat/ask (Base route /api/chat)
+
+Body: { "message": "Giải thích cho tôi khái niệm OOP?" }
+
+Response (200): Trả về chuỗi Markdown trong biến reply.
