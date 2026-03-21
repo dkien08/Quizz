@@ -14,7 +14,6 @@ import ExamRoom from './pages/exam/ExamRoom';
 import PracticeRoom from './pages/exam/PracticeRoom';
 import ExamStats from './pages/exam/ExamStats';
 import ProfilePage from './pages/user/ProfilePage';
-import ResultPage from './pages/user/ResultPage';
 
 function App() {
   // Kiểm tra trạng thái đăng nhập dựa trên Token [cite: 15]
@@ -63,10 +62,6 @@ function App() {
             <Route 
               path="/exam/stats/:id" 
               element={isAuthenticated ? <ExamStats /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/result/:id" 
-              element={isAuthenticated ? <ResultPage /> : <Navigate to="/login" />} 
             />
 
             {/* --- NHÓM LÀM BÀI (EXAM & PRACTICE) --- */}
