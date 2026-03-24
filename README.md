@@ -117,4 +117,4 @@ Mọi endpoints đều bắt đầu từ thư mục gốc của Server (Ví dụ
 ### 📥 Tài liệu hỗ trợ
 Để đảm bảo tính năng Import câu hỏi hoạt động chính xác, vui lòng tải và sử dụng file mẫu bên dưới:
 
-👉 **[Tải File Excel Mẫu Tại Đây (Click để tải)](https://github.com/dkien08/Quizz/raw/main/tailieu/sample_quiz.xlsx)**
+👉 **[Tải File Excel Mẫu Tại Đây (Click để tải)](https://github.com/dkien08/Quizz/raw/master/tailieu/sample_quiz.xlsx)**
