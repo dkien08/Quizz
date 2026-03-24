@@ -13,14 +13,21 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: ["https://quizzapp-front.onrender.com", "http://localhost:5173"],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("CORS bị chặn cho origin:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-    preflightContinue: false,
     optionsSuccessStatus: 204
   })
 );
+app.options('*', cors());
 
 app.use(express.json());
 
@@ -34,7 +41,7 @@ const examRoutes = require("./routes/examRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const userRoutes = require("./routes/userRoutes");
 
-app.use("/api/auth", authRoutes);
+app.use("/auth", authRoutes);
 app.use("/exams", examRoutes);
 app.use("/chat", chatRoutes);
 app.use("/users", userRoutes);

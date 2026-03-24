@@ -1,6 +1,6 @@
 # 📘 API Documentation - Smart Quiz App (Updated)
 
-[cite_start]**Base URL:** `https://quizzapp-kovj.onrender.com/api` (Hoặc `http://localhost:3000/api` khi chạy local) [cite: 2]
+[cite_start]**Base URL:** `https://quizzapp-kovj.onrender.com` (Hoặc `http://localhost:3000` khi chạy local) [cite: 2]
 [cite_start]**Auth Header:** `Authorization: Bearer <your_token>` 🔒 [cite: 3]
 [cite_start]**Content-Type:** `application/json` [cite: 3]
 

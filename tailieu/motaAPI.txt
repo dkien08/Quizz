@@ -1,7 +1,7 @@
 📌 1. YÊU CẦU CHUNG (QUAN TRỌNG)
 Frontend cần lưu ý các chuẩn giao tiếp sau với Backend:
 
-Base URL: Các đường dẫn bên dưới là đường dẫn tương đối. Hãy thêm http://localhost:5000/api (hoặc domain Render/Vercel) vào phía trước. (Ví dụ: /auth/login -> http://localhost:5000/api/auth/login).
+Base URL: Các đường dẫn bên dưới là đường dẫn tương đối. Hãy thêm http://localhost:5000 (hoặc domain Render/Vercel) vào phía trước. (Ví dụ: /auth/login -> http://localhost:5000/auth/login).
 
 Xác thực (Authentication): Các API có đánh dấu 🔒 [Cần Token] bắt buộc phải gửi kèm Header như sau:
 
@@ -25,7 +25,7 @@ Xử lý mã lỗi HTTP:
 
 📌 2. DANH SÁCH API CHI TIẾT
 🟢 Nhóm 1: Xác thực & Tài khoản (Auth & Users)
-(Base route đề xuất: /api/auth và /api/users)
+(Base route đề xuất: /auth và /users)
 
 1. Đăng ký tài khoản
 
@@ -62,7 +62,7 @@ Endpoint: PUT /users/change-password
 Body: { "old_password": "...", "new_password": "..." }
 
 🔵 Nhóm 2: Quản lý & Làm bài thi (Exams)
-(Base route đề xuất: /api/exams)
+(Base route đề xuất: /exams)
 
 6. Lấy danh sách đề thi Public (Trang chủ)
 
@@ -103,7 +103,7 @@ Endpoint: GET /exams/result-detail/:id (Trong đó :id là result_id)
 Mô tả: Trả về danh sách câu hỏi, đáp án User chọn và đáp án đúng.
 
 🟠 Nhóm 3: Dành cho Người tạo đề (Author/Admin)
-(Base route đề xuất: /api/exams)
+(Base route đề xuất: /exams)
 
 11. Lấy danh sách đề tôi đã tạo 🔒 [Cần Token]
 
@@ -163,7 +163,7 @@ Mô tả: Backend sẽ tự check xem đã có giải thích chưa, nếu chưa 
 
 18. Chatbot Trợ lý học tập
 
-Endpoint: POST /api/chat/ask (Base route /api/chat)
+Endpoint: POST /chat/ask (Base route /chat)
 
 Body: { "message": "Giải thích cho tôi khái niệm OOP?" }
 

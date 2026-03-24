@@ -4,7 +4,7 @@ sequenceDiagram
     participant DB as Aiven MySQL
     participant AI as Gemini API
 
-    U->>B: POST /api/chat/explain (question_id)
+    U->>B: POST /chat/explain (question_id)
     B->>DB: SELECT question_text, ai_explanation FROM questions WHERE id = ?
     DB-->>B: Trả về dữ liệu câu hỏi
     
