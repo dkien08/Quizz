@@ -7,6 +7,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "https://quizzapp-front.onrender.com",
+  "https://bookish-potato-r4x66wxj5qwxcpg94-5173.app.github.dev",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
