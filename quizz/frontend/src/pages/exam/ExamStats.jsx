@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../../services/api";
+import api from "../../services/axiosClient";
 import {
   ArrowLeft, BarChart3, Download, Loader2, Eye, X, CheckCircle2, XCircle,
 } from "lucide-react";

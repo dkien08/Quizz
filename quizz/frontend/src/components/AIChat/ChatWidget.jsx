@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Bot, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import api from "../../services/api";
+import api from "../../services/axiosClient";
 
-// 1. Thêm prop initialMessage vào đây để nhận dữ liệu từ cha
+
 const ChatWidget = ({ initialMessage = null }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -18,11 +18,10 @@ const ChatWidget = ({ initialMessage = null }) => {
 
   const messagesEndRef = useRef(null);
 
-  // 👇 2. THÊM ĐOẠN NÀY: Lắng nghe lệnh mở từ bên ngoài (Ví dụ từ trang Ôn tập)
   useEffect(() => {
     if (initialMessage) {
-      setIsOpen(true); // Tự động mở cửa sổ
-      setInput(initialMessage); // Điền sẵn nội dung câu hỏi vào ô nhập
+      setIsOpen(true);
+      setInput(initialMessage); 
     }
   }, [initialMessage]);
   // 👆 Hết phần thêm
@@ -36,14 +35,13 @@ const ChatWidget = ({ initialMessage = null }) => {
   }, [messages, isOpen]);
 
   const handleSend = async (e) => {
-    if (e) e.preventDefault(); // Kiểm tra e tồn tại để tránh lỗi nếu gọi hàm thủ công
+    if (e) e.preventDefault(); 
     if (!input.trim()) return;
 
     const userMsg = { role: "user", content: input };
     setMessages((prev) => [...prev, userMsg]);
     setLoading(true);
 
-    // Lưu lại input hiện tại để gửi, sau đó xóa ô nhập
     const currentMessage = input;
     setInput("");
 

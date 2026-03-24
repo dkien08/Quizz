@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
-import api from "../../services/api";
+import api from "../../services/axiosClient";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Save,

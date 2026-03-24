@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axiosClient from '../../services/axiosClient';
 
-// Nhận setAuth từ App.jsx truyền xuống để cập nhật trạng thái toàn cục
 export default function LoginPage({ setIsAuthenticated }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -17,13 +16,13 @@ export default function LoginPage({ setIsAuthenticated }) {
     setIsLoading(true);
 
     try {
-      // 1. Gọi API đăng nhập [cite: 15]
+      // 1. Gọi API đăng nhập
       const response = await axiosClient.post('/auth/login', {
         username,
         password,
       });
 
-      // 2. Lưu Token vào localStorage [cite: 9, 15]
+      // 2. Lưu Token vào localStorage
       if (response.token) {
         localStorage.setItem('token', response.token);
         
@@ -31,20 +30,17 @@ export default function LoginPage({ setIsAuthenticated }) {
           localStorage.setItem('user', JSON.stringify(response.user));
         }
 
-        // --- ĐIỂM MỚI QUAN TRỌNG ---
-        // Cập nhật state ở App.jsx để Navbar biết bạn đã login
+      
         if (setIsAuthenticated) {
           setIsAuthenticated(true);
         }
-        // ---------------------------
-
-        // 3. Chuyển hướng về trang chủ
+    
         navigate('/');
       } else {
         setError('Không nhận được token từ server.');
       }
     } catch (err) {
-      // Xử lý các mã lỗi HTTP như 400, 401 [cite: 10, 11]
+      // Xử lý các mã lỗi
       setError(
         err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!'
       );

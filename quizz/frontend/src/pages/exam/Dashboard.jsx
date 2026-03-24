@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import api from "../../services/api";
+import api from "../../services/axiosClient";
 import { useNavigate, Link } from "react-router-dom";
 import {
   BarChart2,

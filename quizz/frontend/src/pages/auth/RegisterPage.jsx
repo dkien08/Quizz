@@ -4,10 +4,10 @@ import axiosClient from '../../services/axiosClient';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
-    username: '',      // Giữ nguyên Username theo DB [cite: 14]
+    username: '',
     full_name: '',
     password: '',
-    confirmPassword: '', // Chỉ dùng để kiểm tra tại Frontend
+    confirmPassword: '',
     role: 'users',
   });
   
@@ -28,7 +28,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
     
-    // Bước kiểm tra quan trọng: So sánh 2 lần nhập mật khẩu
+  
     if (formData.password !== formData.confirmPassword) {
       setError('Mật khẩu xác nhận không khớp! Vui lòng kiểm tra lại.');
       return;
@@ -36,20 +36,17 @@ export default function RegisterPage() {
 
     setIsLoading(true);
     try {
-      // Khi gửi lên Backend, ta loại bỏ trường confirmPassword 
-      // vì Database chỉ cần username, password, full_name và role
+  
       const { confirmPassword, ...dataToSubmit } = formData;
 
       const response = await axiosClient.post('/auth/register', dataToSubmit);
       setSuccessMsg(response.message || 'Đăng ký thành công!');
       
-      // Chuyển hướng sau khi người dùng đã thấy thông báo thành công
       setTimeout(() => {
         navigate('/login');
       }, 1500);
       
     } catch (err) {
-      // Bắt lỗi 400 hoặc các lỗi khác từ server [cite: 10]
       setError(err.response?.data?.message || 'Đăng ký thất bại!');
     } finally {
       setIsLoading(false);

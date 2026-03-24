@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../../services/api";
+import api from "../../services/axiosClient";
 import { Sparkles, ArrowLeft, CheckCircle2, XCircle, Trophy, ChevronRight, RefreshCcw, AlertCircle } from "lucide-react";
 
 const PracticeRoom = () => {
