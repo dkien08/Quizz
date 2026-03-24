@@ -114,3 +114,7 @@ Mọi endpoints đều bắt đầu từ thư mục gốc của Server (Ví dụ
 | **User** | `GET` | `/users/profile` | Lấy thông tin tài khoản hiện tại | ✅ |
 
 *(Chú thích: ✅ Yêu cầu truyền Header `Authorization: Bearer <Token>`)*
+### 📥 Tài liệu hỗ trợ
+Để đảm bảo tính năng Import câu hỏi hoạt động chính xác, vui lòng tải và sử dụng file mẫu bên dưới:
+
+👉 **[Tải File Excel Mẫu Tại Đây (Click để tải)](PK)**
