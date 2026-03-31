@@ -134,9 +134,9 @@ const Dashboard = () => {
             </button>
             {activeMenuId === exam.id && (
               <div ref={menuRef} className="absolute right-0 top-8 w-40 bg-white shadow-xl border rounded-lg z-20 overflow-hidden">
-                <button onClick={() => navigate(`/exam/edit/${exam.id}`)} className="w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 flex gap-2 text-gray-700">
+                {/* <button onClick={() => navigate(`/exam/edit/${exam.id}`)} className="w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 flex gap-2 text-gray-700">
                   <Edit size={16} className="text-blue-600" /> Sửa đề
-                </button>
+                </button> */}
                 <button onClick={() => navigate(`/exam/stats/${exam.id}`)} className="w-full text-left px-4 py-2.5 text-sm hover:bg-purple-50 flex gap-2 text-gray-700">
                   <BarChart2 size={16} className="text-purple-600" /> Thống kê
                 </button>

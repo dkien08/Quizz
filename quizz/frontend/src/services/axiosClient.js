@@ -7,27 +7,34 @@ const axiosClient = axios.create({
   },
 });
 
-axiosClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+axiosClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 
 axiosClient.interceptors.response.use(
-  (response) => response.data,
+  (response) => {
+    return response.data;
+  },
   (error) => {
     const status = error.response?.status;
-  
+
     if (status === 401 || status === 403) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      
+
       if (window.location.pathname !== '/login') {
         window.location.href = '/login'; 
       }
     }
+    
     return Promise.reject(error);
   }
 );
