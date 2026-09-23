@@ -16,16 +16,9 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Cho phép request không có origin (Mobile App Native, Postman, server-to-server)
       if (!origin) return callback(null, true);
-
-      // Cho phép nếu nằm trong danh sách trắng
       if (allowedOrigins.includes(origin)) return callback(null, true);
-
-      // Cho phép tất cả các cổng localhost (Flutter Web chạy port ngẫu nhiên)
       if (/^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
-
-      // Cho phép các domain preview từ GitHub Codespaces hoặc Vercel nếu cần
       if (/^https:\/\/.*\.app\.github\.dev$/.test(origin)) return callback(null, true);
 
       console.warn(`[CORS Blocked] Origin: ${origin}`);
@@ -38,8 +31,8 @@ app.use(
   })
 );
 
-// Tự động phản hồi preflight requests (OPTIONS) cho mọi route
-app.options("*", cors());
+// Tương thích Express v5: Sử dụng regex thay vì chuỗi "*"
+app.options(/(.*)/, cors());
 
 // 3. Body parser
 app.use(express.json());
@@ -52,7 +45,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// 5. Health check route (kiểm tra nhanh server có sống hay không)
+// 5. Health check route
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date() });
 });
@@ -76,11 +69,10 @@ app.use((req, res) => {
   });
 });
 
-// 8. Global Error Handler (Middleware bắt toàn bộ lỗi server, tránh sập tiến trình)
+// 8. Global Error Handler
 app.use((err, req, res, next) => {
   console.error("[SERVER ERROR]", err.message || err);
   
-  // Xử lý riêng thông báo lỗi nếu xuất phát từ CORS
   if (err.message === "Yêu cầu bị chặn bởi chính sách CORS") {
     return res.status(403).json({
       success: false,
